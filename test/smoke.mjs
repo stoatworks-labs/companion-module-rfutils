@@ -130,6 +130,7 @@ const self = {
   },
   updateStatus: () => {},
   checkFeedbacks: () => {},
+  checkAllFeedbacks: () => {},
   setActionDefinitions: (d) => (actions = d),
   setFeedbackDefinitions: (d) => (feedbacks = d),
   setVariableDefinitions: (d) => {
@@ -478,6 +479,24 @@ await check("close() settles", async () => {
 
 wss.close();
 server.close();
+console.log("\n== the checkFeedbacks trap ==");
+// InstanceBase.checkFeedbacks(type, ...rest) requires AT LEAST ONE type: with no
+// arguments it forwards [undefined] to the host, which checks a feedback type
+// called "undefined" — i.e. nothing at all. Every feedback then sits frozen at
+// whatever it last evaluated to, with no error anywhere. checkAllFeedbacks() is
+// the correct call for "re-evaluate everything".
+await check("no bare checkFeedbacks() survives in src/", async () => {
+  const { readdirSync, readFileSync } = await import("node:fs");
+  const dir = new URL("../src/", import.meta.url).pathname;
+  const offenders = [];
+  for (const f of readdirSync(dir)) {
+    if (!/\.(js|ts)$/.test(f)) continue;
+    const body = readFileSync(dir + f, "utf8");
+    if (/[^A-Za-z]checkFeedbacks\(\s*\)/.test(body)) offenders.push(f);
+  }
+  assert.deepEqual(offenders, [], "use checkAllFeedbacks() instead");
+});
+
 console.log(
   failures === 0
     ? "\nAll checks passed.\n"

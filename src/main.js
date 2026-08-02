@@ -35,7 +35,7 @@ export default class ModuleInstance extends InstanceBase {
     // own tick — by definition the message that would clear it is not arriving.
     this.staleTimer = setInterval(() => {
       this.refreshVariableValues();
-      this.checkFeedbacks();
+      this.checkAllFeedbacks();
     }, 5000);
   }
 
@@ -144,7 +144,7 @@ export default class ModuleInstance extends InstanceBase {
       return this.reshape();
     }
     this.refreshVariableValues();
-    this.checkFeedbacks();
+    this.checkAllFeedbacks();
   }
 
   removeDevice(deviceId) {
@@ -167,7 +167,7 @@ export default class ModuleInstance extends InstanceBase {
       this.rebuild();
     } else {
       this.refreshVariableValues();
-      this.checkFeedbacks();
+      this.checkAllFeedbacks();
     }
   }
 
@@ -177,7 +177,7 @@ export default class ModuleInstance extends InstanceBase {
     UpdateVariableDefinitions(this);
     UpdatePresets(this);
     this.refreshVariableValues();
-    this.checkFeedbacks();
+    this.checkAllFeedbacks();
   }
 
   device(id) {
