@@ -17,7 +17,7 @@
     "node": "^22.20"
   },
   "dependencies": {
-    "@companion-module/base": "~2.0.4",
+    "@companion-module/base": "~2.1.2",
     "ws": "^8.21.0"
   },
   "devDependencies": {
