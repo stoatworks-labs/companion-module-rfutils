@@ -1,0 +1,23 @@
+{
+  "$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
+  "type": "connection",
+  "id": "rfutils",
+  "name": "rfutils",
+  "shortname": "RFutils",
+  "description": "Radio-mic monitoring on a control surface — per-channel battery, RF and audio feedback across Shure, Sennheiser and AES67 receivers, plus Dante crosspoint make/clear and guarded frequency programming.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": "git+https://github.com/stoatworks-labs/companion-module-rfutils.git",
+  "bugs": "https://github.com/stoatworks-labs/companion-module-rfutils/issues",
+  "maintainers": [{ "name": "Allan Sargeant", "email": "" }],
+  "runtime": {
+    "type": "node22",
+    "api": "nodejs-ipc",
+    "apiVersion": "0.0.0",
+    "entrypoint": "../src/main.js"
+  },
+  "legacyIds": [],
+  "manufacturer": "Stoatworks Labs",
+  "products": ["RFutils"],
+  "keywords": ["radio-mic", "shure", "sennheiser", "rf", "aes67", "wireless"]
+}

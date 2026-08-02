@@ -1,0 +1,27 @@
+{
+  "name": "companion-module-rfutils",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier -w .",
+    "test": "node test/smoke.mjs",
+    "package": "companion-module-build"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stoatworks-labs/companion-module-rfutils.git"
+  },
+  "engines": {
+    "node": "^22.20"
+  },
+  "dependencies": {
+    "@companion-module/base": "~2.0.4",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@companion-module/tools": "^3.0.1",
+    "prettier": "^3.8.3"
+  }
+}
