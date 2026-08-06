@@ -10,6 +10,21 @@ A [Bitfocus Companion](https://bitfocus.io/companion) connection module for
 battery, RF and audio state on a control surface, and drive Dante crosspoints
 from it.
 
+<!-- downloads:start -->
+
+## Download
+
+**[v1.0.0](https://github.com/stoatworks-labs/companion-module-rfutils/releases/tag/v1.0.0)**
+
+This release contains:
+
+- [`companion-module-rfutils-pkg.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/latest/download/companion-module-rfutils-pkg.tgz) — npm package, 24 KB
+- [`rfutils-1.0.0.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/download/v1.0.0/rfutils-1.0.0.tgz) — npm package, 23 KB
+
+All builds, checksums and release notes: [github.com/stoatworks-labs/companion-module-rfutils/releases](https://github.com/stoatworks-labs/companion-module-rfutils/releases).
+
+<!-- downloads:end -->
+
 ## What it does
 
 - **Actions** — make and clear a Dante crosspoint, **program frequencies to real
