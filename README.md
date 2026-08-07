@@ -18,7 +18,7 @@ from it.
 
 This release contains:
 
-- [`companion-module-rfutils-pkg.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/latest/download/companion-module-rfutils-pkg.tgz) — npm package, 24 KB
+- [`companion-module-rfutils-pkg.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/latest/download/companion-module-rfutils-pkg.tgz) — npm package, 23 KB
 - [`rfutils-1.0.0.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/download/v1.0.0/rfutils-1.0.0.tgz) — npm package, 23 KB
 
 All builds, checksums and release notes: [github.com/stoatworks-labs/companion-module-rfutils/releases](https://github.com/stoatworks-labs/companion-module-rfutils/releases).
