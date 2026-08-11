@@ -1,0 +1,41 @@
+name: ci
+
+# Until this existed the repo had no workflow with a `pull_request` trigger at
+# all — only a tag-driven release — so Dependabot bumps arrived with no status
+# check to gate a merge on and simply accumulated.
+#
+# The smoke test is the check worth having: it imports the module's real source,
+# which pulls in @companion-module/base and the runtime deps for real, so a bump
+# that breaks them fails here rather than on someone's rack at a show.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          # package.json pins engines.node to ^22.20; matching it here means the
+          # check runs on the same major Companion itself ships.
+          node-version: 22
+          cache: npm
+
+      # Deliberately a plain `npm ci` — no --legacy-peer-deps. A bump that only
+      # installs by ignoring the peer graph is exactly what this is here to catch.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      # Bundling is a separate failure mode from running: the module can pass its
+      # smoke test and still fail to package, which is what a release actually
+      # ships. Same command release.yml runs, so a red here means a red release.
+      - name: Build module package
+        run: npm run package
