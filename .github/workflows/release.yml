@@ -40,8 +40,10 @@ jobs:
           # the tool builds it from — re-tarring that produces pkg/<id>/... and
           # buries package.json a level deeper than any installer looks for it,
           # which is how twelve releases shipped an archive nothing could load.
-          tgz=$(ls -1 *.tgz 2>/dev/null | head -n 1 || true)
-          [ -n "$tgz" ] || { echo "::error::companion-module-build produced no .tgz"; exit 1; }
+          shopt -s nullglob
+          files=(*.tgz)
+          [ ${#files[@]} -gt 0 ] || { echo "::error::companion-module-build produced no .tgz"; exit 1; }
+          tgz=${files[0]}
           cp "$tgz" out/
           # A stable name for the /releases/latest/download/ alias the website and
           # Burrow prefer, byte-identical to the versioned archive beside it.
@@ -52,11 +54,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # No pipes below: `tar tzf | head` makes tar die of SIGPIPE once head
+          # has its line, and under pipefail that fails the step for a good
+          # package, depending on a race with the listing size.
           for f in out/*.tgz; do
-            root=$(tar tzf "$f" | head -n 1 | cut -d/ -f1)
+            list=$(tar tzf "$f")
+            first=${list%%$'\n'*}
+            root=${first%%/*}
             for want in "$root/package.json" "$root/companion/manifest.json"; do
-              tar tzf "$f" | grep -qx "$want" \
-                || { echo "::error::$f has no $want, so Companion would not load it"; exit 1; }
+              case $'\n'"$list"$'\n' in
+                *$'\n'"$want"$'\n'*) ;;
+                *) echo "::error::$f has no $want, so Companion would not load it"; exit 1 ;;
+              esac
             done
             echo "$f: ok — root is $root/"
           done

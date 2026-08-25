@@ -48,11 +48,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          f=$(ls -1 *.tgz 2>/dev/null | head -n 1 || true)
-          [ -n "$f" ] || { echo "::error::companion-module-build produced no .tgz"; exit 1; }
-          root=$(tar tzf "$f" | head -n 1 | cut -d/ -f1)
+          shopt -s nullglob
+          # No pipes below, deliberately. `tar tzf "$f" | head -n 1` makes tar die
+          # of SIGPIPE the moment head has its line, and under pipefail that fails
+          # the step for a package that is perfectly good. Whether it loses the
+          # race depends on the listing size, so it passed on two of fifteen
+          # siblings and went red on the rest.
+          files=(*.tgz)
+          [ ${#files[@]} -gt 0 ] || { echo "::error::companion-module-build produced no .tgz"; exit 1; }
+          f=${files[0]}
+          list=$(tar tzf "$f")
+          first=${list%%$'\n'*}
+          root=${first%%/*}
           for want in "$root/package.json" "$root/companion/manifest.json"; do
-            tar tzf "$f" | grep -qx "$want" \
-              || { echo "::error::$f has no $want, so Companion would not load it"; exit 1; }
+            case $'\n'"$list"$'\n' in
+              *$'\n'"$want"$'\n'*) ;;
+              *) echo "::error::$f has no $want, so Companion would not load it"; exit 1 ;;
+            esac
           done
           echo "$f: ok — root is $root/"
