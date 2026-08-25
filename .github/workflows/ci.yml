@@ -39,3 +39,20 @@ jobs:
       # ships. Same command release.yml runs, so a red here means a red release.
       - name: Build module package
         run: npm run package
+
+      # Packaging succeeding is not the same as the package being loadable. What
+      # Companion (and Burrow) look for is package.json in the archive's root
+      # directory, and release.yml once shipped an archive that had it a level
+      # deeper. Assert the shape here, where a PR can go red for it.
+      - name: Check the package is loadable
+        shell: bash
+        run: |
+          set -euo pipefail
+          f=$(ls -1 *.tgz 2>/dev/null | head -n 1 || true)
+          [ -n "$f" ] || { echo "::error::companion-module-build produced no .tgz"; exit 1; }
+          root=$(tar tzf "$f" | head -n 1 | cut -d/ -f1)
+          for want in "$root/package.json" "$root/companion/manifest.json"; do
+            tar tzf "$f" | grep -qx "$want" \
+              || { echo "::error::$f has no $want, so Companion would not load it"; exit 1; }
+          done
+          echo "$f: ok — root is $root/"

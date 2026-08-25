@@ -32,11 +32,34 @@ jobs:
       - name: Collect package
         shell: bash
         run: |
+          set -euo pipefail
           mkdir -p out
-          # companion-module-build emits pkg/ and/or a .tgz depending on version
-          find . -maxdepth 2 -name '*.tgz' -not -path './node_modules/*' -exec cp {} out/ \; || true
-          if [ -d pkg ]; then tar czf "out/companion-module-rfutils-pkg.tgz" pkg; fi
+          # companion-module-build writes <manifest id>-<version>.tgz, and that
+          # archive IS the distributable: its root directory holds package.json,
+          # which is where Companion looks. `pkg/` is only the staging directory
+          # the tool builds it from — re-tarring that produces pkg/<id>/... and
+          # buries package.json a level deeper than any installer looks for it,
+          # which is how twelve releases shipped an archive nothing could load.
+          tgz=$(ls -1 *.tgz 2>/dev/null | head -n 1 || true)
+          [ -n "$tgz" ] || { echo "::error::companion-module-build produced no .tgz"; exit 1; }
+          cp "$tgz" out/
+          # A stable name for the /releases/latest/download/ alias the website and
+          # Burrow prefer, byte-identical to the versioned archive beside it.
+          cp "$tgz" "out/companion-module-rfutils-pkg.tgz"
           ls -la out
+
+      - name: Check the packages are loadable
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in out/*.tgz; do
+            root=$(tar tzf "$f" | head -n 1 | cut -d/ -f1)
+            for want in "$root/package.json" "$root/companion/manifest.json"; do
+              tar tzf "$f" | grep -qx "$want" \
+                || { echo "::error::$f has no $want, so Companion would not load it"; exit 1; }
+            done
+            echo "$f: ok — root is $root/"
+          done
 
       - uses: actions/upload-artifact@v4
         with:
