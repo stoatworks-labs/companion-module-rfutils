@@ -18,10 +18,11 @@ export default function UpdateActions(self) {
   const channels = channelChoices(self);
   const devices = deviceChoices(self);
 
-  const text = async (event, key) =>
-    (
-      await self.parseVariablesInString(String(event.options[key] ?? ""))
-    ).trim();
+  // Options declared `useVariables: true` arrive already expanded: Companion
+  // resolves them before invoking the callback. `parseVariablesInString` does
+  // not exist in base 2.x — on the context or on InstanceBase — and calling it
+  // throws when the action fires, while the module still loads cleanly.
+  const text = (event, key) => String(event.options[key] ?? "").trim();
 
   const run = async (fn) => {
     try {
@@ -71,10 +72,10 @@ export default function UpdateActions(self) {
       callback: async (event) =>
         run(async () => {
           const body = {
-            sourceDevice: await text(event, "sourceDevice"),
-            sourceChannel: await text(event, "sourceChannel"),
-            destinationDevice: await text(event, "destinationDevice"),
-            destinationChannel: await text(event, "destinationChannel"),
+            sourceDevice: text(event, "sourceDevice"),
+            sourceChannel: text(event, "sourceChannel"),
+            destinationDevice: text(event, "destinationDevice"),
+            destinationChannel: text(event, "destinationChannel"),
           };
           if (Object.values(body).some((v) => !v)) {
             self.log(
@@ -124,10 +125,10 @@ export default function UpdateActions(self) {
       callback: async (event) =>
         run(async () => {
           const body = {
-            sourceDevice: await text(event, "sourceDevice"),
-            sourceChannel: await text(event, "sourceChannel"),
-            destinationDevice: await text(event, "destinationDevice"),
-            destinationChannel: await text(event, "destinationChannel"),
+            sourceDevice: text(event, "sourceDevice"),
+            sourceChannel: text(event, "sourceChannel"),
+            destinationDevice: text(event, "destinationDevice"),
+            destinationChannel: text(event, "destinationChannel"),
           };
           if (Object.values(body).some((v) => !v)) {
             self.log(
@@ -162,7 +163,7 @@ export default function UpdateActions(self) {
       ],
       callback: async (event) =>
         run(async () => {
-          const raw = await text(event, "targets");
+          const raw = text(event, "targets");
           const targets = JSON.parse(raw || "[]");
           if (!Array.isArray(targets) || targets.length === 0) {
             self.log("warn", "Program skipped — no targets given.");

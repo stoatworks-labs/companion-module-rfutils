@@ -138,13 +138,22 @@ export const socket = {
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.reconnectTimer = null;
     if (this.ws) {
-      try {
-        this.ws.removeAllListeners();
-        this.ws.close();
-      } catch {
-        // Closing a socket that never opened throws; nothing to recover.
-      }
+      const ws = this.ws;
       this.ws = null;
+      try {
+        ws.removeAllListeners();
+        // close() on a socket still in CONNECTING calls abortHandshake(), which
+        // defers the failure: `process.nextTick(emitErrorAndClose, ...)`. That
+        // 'error' therefore lands after this function has returned and after the
+        // catch below has gone out of scope, on a socket whose listeners we just
+        // removed — and Node throws on an unlistened 'error', killing the module
+        // process. A no-op listener that outlives close() is what absorbs it.
+        ws.on("error", () => {});
+        ws.close();
+      } catch {
+        // Closing a socket that never opened can also throw synchronously;
+        // nothing to recover.
+      }
     }
   },
 };

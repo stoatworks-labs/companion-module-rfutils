@@ -5,7 +5,7 @@ import UpdateFeedbacks from "./feedbacks.js";
 import UpdateVariableDefinitions from "./variables.js";
 import UpdatePresets from "./presets.js";
 import { socket } from "./api.js";
-import { aboutField } from './about-field.js'
+import { aboutField } from "./about-field.js";
 
 /** Companion variable ids allow only [a-zA-Z0-9_]. RFutils channel ids carry a
  *  vendor prefix and separators, so every one needs sanitising. */
@@ -116,10 +116,10 @@ export default class ModuleInstance extends InstanceBase {
         value:
           "RFutils' Shure and Sennheiser adapters are documented in its README's Protocol status table, and the Sennheiser one is labelled an <b>unverified skeleton</b>. A channel reading nothing here may be the receiver, the network, or the adapter — check that table before assuming a battery is flat.",
       },
-    
-    	// Vendored from stoatworks-backend/about. A Companion module has no
-    	// UI of its own, so this config panel is the only surface it has.
-    	aboutField(),
+
+      // Vendored from stoatworks-backend/about. A Companion module has no
+      // UI of its own, so this config panel is the only surface it has.
+      aboutField(),
     ];
   }
 

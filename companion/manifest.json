@@ -5,7 +5,7 @@
   "name": "rfutils",
   "shortname": "RFutils",
   "description": "Radio-mic monitoring on a control surface — per-channel battery, RF and audio feedback across Shure, Sennheiser and AES67 receivers, plus Dante crosspoint make/clear and guarded frequency programming.",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "license": "MIT",
   "repository": "git+https://github.com/stoatworks-labs/companion-module-rfutils.git",
   "bugs": "https://github.com/stoatworks-labs/companion-module-rfutils/issues",

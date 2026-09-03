@@ -142,7 +142,6 @@ const self = {
     presetDefs = p;
   },
   setVariableValues: (v) => Object.assign(variableValues, v),
-  parseVariablesInString: async (s) => s,
   device(id) {
     return this.devices.find((d) => d.id === String(id ?? "")) ?? null;
   },
@@ -496,6 +495,57 @@ await check("no bare checkFeedbacks() survives in src/", async () => {
   }
   assert.deepEqual(offenders, [], "use checkAllFeedbacks() instead");
 });
+
+// --- the parseVariablesInString trap ----------------------------------------
+// `parseVariablesInString` and `parseVariablesInField` were removed from
+// @companion-module/base 2.x. Neither is on the callback context, on
+// InstanceBase, or anywhere in the package. Companion expands a `useVariables` option itself before invoking the
+// callback, so the option arrives already resolved: the call is redundant as
+// well as fatal, throwing "... is not a function" the moment
+// that one action or feedback fires. Nothing else catches it — the module
+// loads, init() succeeds, every definition registers, and every path that does
+// not make the call keeps working, so the suite passes with the bug live. This
+// fixture no longer stubs either function, so a reintroduced call now throws
+// here too; the grep is the backstop for a path the fixture never exercises. It
+// matches the call form only, so prose naming the functions stays legal.
+const { readdirSync: pvReadDir, readFileSync: pvReadFile } =
+  await import("node:fs");
+const pvOffenders = () => {
+  const dir = new URL("../src/", import.meta.url).pathname;
+  const bad = [];
+  for (const f of pvReadDir(dir)) {
+    if (!/\.(js|ts)$/.test(f)) continue;
+    if (/parseVariablesIn(String|Field)\s*\(/.test(pvReadFile(dir + f, "utf8")))
+      bad.push(f);
+  }
+  return bad;
+};
+
+await check("no parseVariablesInString/Field call survives in src/", () => {
+  assert.deepEqual(
+    pvOffenders(),
+    [],
+    "read the already-resolved event.options value instead",
+  );
+});
+
+// Companion keys an installed module on id + version and discards a reinstall
+// whose pair it already has. If companion/manifest.json lags package.json, every
+// release after the manifest's version is silently refused by any Companion that
+// already has the module — the update appears to work and changes nothing.
+await check(
+  "companion/manifest.json version matches package.json",
+  async () => {
+    const { readFileSync } = await import("node:fs");
+    const read = (p) =>
+      JSON.parse(readFileSync(new URL(p, import.meta.url).pathname, "utf8"));
+    assert.equal(
+      read("../companion/manifest.json").version,
+      read("../package.json").version,
+      "bump both, or the release never reaches an existing install",
+    );
+  },
+);
 
 console.log(
   failures === 0
