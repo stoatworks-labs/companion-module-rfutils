@@ -1,0 +1,12 @@
+# Vendored from stoatworks-backend/about/companion by scripts/sync-about.py.
+# Formatting the copy drifts it from the master and the next sync reverts it;
+# the master is the only place to change it.
+src/about-field.js
+src/about-field.d.ts
+
+# Build output and agent worktrees - not authored here.
+node_modules
+dist
+pkg
+*.tgz
+.claude
