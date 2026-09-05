@@ -14,12 +14,12 @@ from it.
 
 ## Download
 
-**[v1.0.2](https://github.com/stoatworks-labs/companion-module-rfutils/releases/tag/v1.0.2)**
+**[v1.0.3](https://github.com/stoatworks-labs/companion-module-rfutils/releases/tag/v1.0.3)**
 
 This release contains:
 
-- [`companion-module-rfutils-pkg.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/latest/download/companion-module-rfutils-pkg.tgz) — npm package, 23 KB
-- [`rfutils-1.0.2.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/download/v1.0.2/rfutils-1.0.2.tgz) — npm package, 23 KB
+- [`companion-module-rfutils-pkg.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/latest/download/companion-module-rfutils-pkg.tgz) — npm package, 24 KB
+- [`rfutils-1.0.3.tgz`](https://github.com/stoatworks-labs/companion-module-rfutils/releases/download/v1.0.3/rfutils-1.0.3.tgz) — npm package, 24 KB
 
 All builds, checksums and release notes: [github.com/stoatworks-labs/companion-module-rfutils/releases](https://github.com/stoatworks-labs/companion-module-rfutils/releases).
 
