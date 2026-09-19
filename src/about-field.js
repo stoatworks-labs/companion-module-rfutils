@@ -38,8 +38,37 @@
  */
 
 import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
+
+/**
+ * The module's own package.json / companion/manifest.json, found by walking
+ * up from THIS file - because this file lives in two places. In a checkout it
+ * is src/about-field.js and the files are one level up; in the package that
+ * companion-module-build writes it is bundled into main.js at the package
+ * root and they are right beside it. The old `require('../package.json')`
+ * only knew the first layout: installed from a release, it pointed at the
+ * parent of the whole module, threw inside getConfigFields(), and Companion
+ * force-restarted the module for ever. Every packaged release from 2026-08-03
+ * to 2026-09-18 shipped that way; the developer-modules-path checkouts on the
+ * machine that cut them never did, which is why nobody here saw it.
+ *
+ * Nothing in here throws: an About block that cannot find its facts is a
+ * poorer About block, not a module that will not load.
+ */
+function readOwnJson(relative) {
+	let dir = dirname(fileURLToPath(import.meta.url))
+	for (let depth = 0; depth < 3; depth++) {
+		try {
+			return require(join(dir, relative))
+		} catch {
+			dir = dirname(dir)
+		}
+	}
+	return null
+}
 
 /** The canonical set, matching stoatworks-backend/funding/FUNDING.yml. */
 const FUNDING = [
@@ -55,8 +84,12 @@ const HOME = 'https://stoatworks-labs.com'
  * Pull the repo URL out of whatever shape package.json uses for it - a string,
  * or an object with a `url` that may carry a `git+` prefix and a `.git` suffix.
  */
-function repoUrl(pkg) {
-	const raw = typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url
+function repoUrl(pkg, manifest) {
+	// The manifest first: companion-module-build writes a package.json with no
+	// `repository` at all, so in the installed package it is the only copy.
+	const raw =
+		manifest.repository ||
+		(typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url)
 	if (!raw) return ''
 	return raw
 		.replace(/^git\+/, '')
@@ -77,24 +110,22 @@ function link(url, text) {
  * @returns {object} A `static-text` field to append to getConfigFields().
  */
 export function aboutField(options = {}) {
-	// Relative to this file, so it finds the module's package.json wherever the
-	// module is installed rather than whatever cwd Companion happens to have.
-	const pkg = require('../package.json')
+	const pkg = readOwnJson('package.json') || {}
+	const manifest = readOwnJson(join('companion', 'manifest.json')) || {}
 
 	// shortname, not name: manifest `name` is the lowercase connection id, so
 	// using it would put "simplecue" and "weblinked" in front of the user
 	// instead of SimpleCue and WebLinked.
-	let name = options.name
-	if (!name) {
-		try {
-			const manifest = require('../companion/manifest.json')
-			name = manifest.shortname || manifest.products?.[0] || manifest.name
-		} catch {
-			name = pkg.name.replace(/^companion-module-/, '')
-		}
-	}
+	const name =
+		options.name ||
+		manifest.shortname ||
+		manifest.products?.[0] ||
+		manifest.name ||
+		(pkg.name || 'this module').replace(/^companion-module-/, '')
+	// companion-module-build writes the version into both files; either will do.
+	const version = pkg.version || manifest.version || ''
 
-	const repo = repoUrl(pkg)
+	const repo = repoUrl(pkg, manifest)
 
 	const rows = []
 	if (repo) rows.push(link(repo, 'Source on GitHub'))
@@ -108,7 +139,7 @@ export function aboutField(options = {}) {
 		width: 12,
 		label: 'About',
 		value:
-			`<b>${name}</b> v${pkg.version} &mdash; ${rows.join(' &middot; ')}<br>` +
+			`<b>${name}</b>${version ? ` v${version}` : ''} &mdash; ${rows.join(' &middot; ')}<br>` +
 			`This module is free and open source. If it is useful to you, ` +
 			`supporting the work keeps it coming: ${funding}.`,
 	}
