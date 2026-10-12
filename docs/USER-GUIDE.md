@@ -1,16 +1,16 @@
 # Companion — RFutils user guide
 
-This module puts **a radio-mic rack on a control surface**, through
-[RFutils](https://github.com/stoatworks-labs/RFutils): per-channel battery, RF and audio state
+This module puts a radio-mic rack on a control surface, through
+[RFutils](https://github.com/stoatworks-labs/RFutils): battery, RF and audio state per channel
 across mixed vendors, and frequency programming.
 
-The [README](../README.md) covers installing the module. This is how to build a page that tells
-you the truth about a rack.
+The [README](../README.md) covers installing the module. This guide is about building a page that
+tells you the truth about a rack.
 
-> **Before you rely on this:** how much to trust a *reading* depends on the vendor adapter behind
-> it, not on this module. RFutils' README carries a **Protocol status** table, and the Sennheiser
-> adapter is labelled an *unverified skeleton*. A channel showing nothing may be the receiver, the
-> network, or the adapter.
+> **Before you rely on this:** how far you can trust a *reading* depends on the vendor adapter
+> behind it, not on this module. RFutils' README has a **Protocol status** table, and the
+> Sennheiser adapter is labelled an *unverified skeleton*. A channel showing nothing could be the
+> receiver, the network or the adapter.
 >
 > This module was built with AI assistance, directed and reviewed by a human author.
 
@@ -22,8 +22,9 @@ The RFutils server, port **8420** by default.
 
 > **No authentication, and it binds `0.0.0.0`.** Keep it on a trusted production network.
 
-**Set the battery and RF thresholds in the connection config**, not on each button. Every channel
-tile then agrees without you editing forty buttons, and a change before doors applies everywhere.
+**Set the battery and RF thresholds in the connection config**, not on each button. That way every
+channel tile agrees without you editing forty buttons, and a change before doors applies
+everywhere.
 
 ---
 
@@ -36,35 +37,35 @@ tile then agrees without you editing forty buttons, and a change before doors ap
 | red | battery critical |
 | **blue** | **this channel has stopped reporting** |
 
-**Blue wins over everything, and it is the important one.**
+**Blue beats everything else, and it's the one that matters.**
 
-Every threshold here goes dark when a receiver goes quiet rather than showing its last value —
-because without that, **a dead receiver looks healthy**. The variables read `--` for the same
-reason: a battery percentage from twenty minutes ago looks exactly like a current one, and the
-one time that matters is the one time it will cost you.
+Every threshold here goes dark when a receiver goes quiet, rather than showing its last value,
+because otherwise **a dead receiver looks healthy**. The variables read `--` for the same reason:
+a battery percentage from twenty minutes ago looks no different from a current one, and you'll
+only find out which it was at the worst possible moment.
 
 ---
 
 ## Audio present and audio silent
 
-Both take a dBFS threshold, and they are different questions:
+Both take a dBFS threshold, and they answer different questions:
 
 - **`-60`** catches "the mic is open".
-- **Towards `-20`** catches "someone is actually talking".
+- **Towards `-20`** catches "someone's actually talking".
 
 Pick per page. A cue light wants the second; a fault light wants the first.
 
-Both go dark on a stale channel, because **silence and no-information are different things** and
-a page that conflates them will send someone on stage to fix a receiver that is fine.
+Both go dark on a stale channel, because **silence and no information aren't the same thing**, and
+a page that mixes them up will send someone on stage to fix a receiver that's fine.
 
 ---
 
 ## RF is normalised across vendors
 
 RF is reported 0–100 whatever the receiver is, so **one threshold means the same thing on every
-box in the rack**. That is the point of putting a mixed rack behind one server.
+box in the rack**. That's the reason for putting a mixed rack behind one server in the first place.
 
-Battery is not always so cooperative — read the vendor's own units where the adapter exposes them.
+Battery isn't always so obliging. Read the vendor's own units where the adapter gives you them.
 
 ---
 
@@ -73,7 +74,7 @@ Battery is not always so cooperative — read the vendor's own units where the a
 > **Program frequencies to receivers sends commands to real hardware** that may be in use on a
 > show.
 
-It is a **dry run unless *Actually transmit* is ticked**, and the log line says which happened.
+It's a **dry run unless *Actually transmit* is ticked**, and the log line says which happened.
 Leave it as a dry run while you build the page, and read the log before you tick the box.
 
 ---
@@ -83,7 +84,7 @@ Leave it as a dry run while you build the page, and read the log before you tick
 1. **Blue on every channel tile.** Without it the rack lies about its dead channels.
 2. **Thresholds in the connection config**, so the whole page agrees.
 3. **Audio-present at the threshold that matches the question** the page is asking.
-4. **Programming buttons on their own page**, dry-run by default.
+4. **Programming buttons on their own page**, dry run by default.
 
 ---
 
@@ -101,7 +102,7 @@ Leave it as a dry run while you build the page, and read the log before you tick
 
 ## See also
 
-- [README](../README.md) — installing, and the full action/feedback/variable list
-- [`companion/HELP.md`](../companion/HELP.md) — the same material, in Companion's help panel
-- [RFutils](https://github.com/stoatworks-labs/RFutils) — the server, and its **Protocol status**
+- [README](../README.md): installing, and the full list of actions, feedbacks and variables
+- [`companion/HELP.md`](../companion/HELP.md): the same material, in Companion's help panel
+- [RFutils](https://github.com/stoatworks-labs/RFutils): the server, and its **Protocol status**
   table
