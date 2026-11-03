@@ -9,6 +9,8 @@ A [Bitfocus Companion](https://bitfocus.io/companion) module for
 battery, RF and audio state on a control surface, and lets you drive Dante
 crosspoints from it too.
 
+The [project page](https://stoatworks-labs.com/software/companion-rfutils/) has the downloads and the [user guide](https://stoatworks-labs.com/software/companion-rfutils/guide/).
+
 <!-- downloads:start -->
 
 ## Download
