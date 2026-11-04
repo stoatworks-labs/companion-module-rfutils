@@ -1,4 +1,4 @@
-import { InstanceBase, Regex, InstanceStatus } from "@companion-module/base";
+import { InstanceBase, InstanceStatus } from "@companion-module/base";
 import { UpgradeScripts } from "./upgrades.js";
 import UpdateActions from "./actions.js";
 import UpdateFeedbacks from "./feedbacks.js";
@@ -65,21 +65,27 @@ export default class ModuleInstance extends InstanceBase {
         value:
           "The RFutils server, port 8420 by default. <b>There is no authentication and it binds 0.0.0.0</b> — anyone who can reach the port can read your inventory and, through the programming API, send commands to real receivers. Keep it on a trusted production network.",
       },
+      // Plain text and number fields rather than Regex.HOSTNAME / Regex.PORT,
+      // which base 2.2.2 deprecated. A saved string port is converted in
+      // upgrades.js.
       {
         type: "textinput",
         id: "host",
         label: "RFutils host",
+        tooltip: "IP address (IPv4 or IPv6) or hostname",
         width: 8,
+        minLength: 1,
         default: "127.0.0.1",
-        regex: Regex.HOSTNAME,
       },
       {
-        type: "textinput",
+        type: "number",
         id: "port",
         label: "Port",
         width: 4,
-        default: "8420",
-        regex: Regex.PORT,
+        min: 1,
+        max: 65535,
+        asInteger: true,
+        default: 8420,
       },
       {
         type: "number",
